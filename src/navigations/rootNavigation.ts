@@ -4,9 +4,9 @@ import {
     NavigationContainerRef, NavigationAction
 } from '@react-navigation/native';
 
-export const navigationRef:
+export let navigationRef:
     React.RefObject<NavigationContainerRef> = React.createRef();
-// export const navigation = navigationRef.current
+// export let navigation = navigationRef.current
 export function navigate(name: string, params?: object): void {
     navigationRef.current?.navigate(name, params);
 }
@@ -22,7 +22,7 @@ export function push(name: string, params?: object): void {
 export function goBack(): void {
     navigationRef.current?.goBack();
 }
-export const navigation = {
+export let navigation = {
     navigate,
     dispatch,
     replace,
