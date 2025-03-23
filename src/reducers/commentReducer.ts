@@ -2,8 +2,8 @@ import { Alert } from 'react-native'
 import { firestore } from 'firebase'
 import { UserInfo } from './userReducer'
 import { ExtraPost } from './postReducer'
-export let LIMIT_COMMENTS_PER_LOADING = 10
-export let commentActionTypes = {
+export const LIMIT_COMMENTS_PER_LOADING = 10
+export const commentActionTypes = {
     FETCH_COMMENTS_REQUEST: 'FETCH_COMMENTS_REQUEST',
     FETCH_COMMENTS_SUCCESS: 'FETCH_COMMENTS_SUCCESS',
     FETCH_COMMENTS_FAILURE: 'FETCH_COMMENTS_FAILURE',
@@ -53,12 +53,12 @@ export type CommentListWithScroll = {
 }
 export type CommentAction = CommentSuccessAction<CommentExtraList>
     | CommentErrorAction | CommentSuccessAction<CommentListWithScroll>
-let defaultState: CommentExtraList = {
+const defaultState: CommentExtraList = {
     comments: [],
     post: {},
     scrollDown: false
 }
-let reducer = (state: CommentExtraList = defaultState, action: CommentAction): CommentExtraList => {
+const reducer = (state: CommentExtraList = defaultState, action: CommentAction): CommentExtraList => {
     switch (action.type) {
         case commentActionTypes.FETCH_COMMENTS_REQUEST:
             state = { ...defaultState }
@@ -69,7 +69,7 @@ let reducer = (state: CommentExtraList = defaultState, action: CommentAction): C
             return state
         case commentActionTypes.FETCH_COMMENTS_FAILURE:
             action = <CommentErrorAction>action
-            let message = action.payload.message
+            const message = action.payload.message
             Alert.alert('Error', message)
             return state
         case commentActionTypes.LOAD_MORE_COMMENTS_REQUEST:
@@ -85,7 +85,7 @@ let reducer = (state: CommentExtraList = defaultState, action: CommentAction): C
             return state
         case commentActionTypes.LOAD_MORE_COMMENTS_FAILURE:
             action = <CommentErrorAction>action
-            let message2 = action.payload.message
+            const message2 = action.payload.message
             Alert.alert('Error', message2)
             return state
         case commentActionTypes.TOGGLE_LIKE_COMMENT_REQUEST:
@@ -99,7 +99,7 @@ let reducer = (state: CommentExtraList = defaultState, action: CommentAction): C
             return state
         case commentActionTypes.TOGGLE_LIKE_COMMENT_FAILURE:
             action = <CommentErrorAction>action
-            let message3 = action.payload.message
+            const message3 = action.payload.message
             Alert.alert('Error', message3)
             return state
         case commentActionTypes.TOGGLE_LIKE_REPLY_REQUEST:
@@ -113,7 +113,7 @@ let reducer = (state: CommentExtraList = defaultState, action: CommentAction): C
             return state
         case commentActionTypes.TOGGLE_LIKE_REPLY_FAILURE:
             action = <CommentErrorAction>action
-            let message4 = action.payload.message
+            const message4 = action.payload.message
             Alert.alert('Error', message4)
             return state
         case commentActionTypes.REPLY_COMMENT_REQUEST:
@@ -127,7 +127,7 @@ let reducer = (state: CommentExtraList = defaultState, action: CommentAction): C
             return state
         case commentActionTypes.REPLY_COMMENT_FAILURE:
             action = <CommentErrorAction>action
-            let message5 = action.payload.message
+            const message5 = action.payload.message
             Alert.alert('Error', message5)
             return state
         default:
