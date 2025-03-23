@@ -1,14 +1,14 @@
 import { Alert } from 'react-native'
 import { ProfileX } from './profileXReducer'
-export const seenTypes = {
+export let seenTypes = {
     NOTSEEN: 0,
     SEEN: 1,
 }
-export const onlineTypes = {
+export let onlineTypes = {
     ACTIVE: 1,
     OFFLINE: 0
 }
-export const messagesTypes = {
+export let messagesTypes = {
     TEXT: 1,
     IMAGE: 2,
     SUPER_IMAGE: 3,
@@ -17,7 +17,7 @@ export const messagesTypes = {
     EMOJI: 6,
     REPLY_STORY: 7,
 }
-export const emojiTypes = {
+export let emojiTypes = {
     LOVE: 1,
     HAHA: 2,
     WOW: 3,
@@ -25,7 +25,7 @@ export const emojiTypes = {
     ANGRY: 5,
     LIKE: 6
 }
-export const messagesActionTypes = {
+export let messagesActionTypes = {
     TRIGGER_MESSAGES_LISTENER_REQUEST: 'TRIGGER_MESSAGES_LISTENER_REQUEST',
     TRIGGER_MESSAGES_LISTENER_SUCCESS: 'TRIGGER_MESSAGES_LISTENER_SUCCESS',
     TRIGGER_MESSAGES_LISTENER_FAILURE: 'TRIGGER_MESSAGES_LISTENER_FAILURE',
@@ -85,9 +85,9 @@ export interface MessageSuccessAction<T> {
 export type MessageAction = MessageSuccessAction<MessageList>
     | MessageErrorAction
 
-const defaultState: MessageList = []
+let defaultState: MessageList = []
 
-const reducer = (state: MessageList = defaultState, action: MessageAction): MessageList => {
+let reducer = (state: MessageList = defaultState, action: MessageAction): MessageList => {
     switch (action.type) {
         case messagesActionTypes.TRIGGER_MESSAGES_LISTENER_REQUEST:
             state = [...defaultState]
@@ -98,7 +98,7 @@ const reducer = (state: MessageList = defaultState, action: MessageAction): Mess
             return state
         case messagesActionTypes.TRIGGER_MESSAGES_LISTENER_FAILURE:
             action = <MessageErrorAction>action
-            const message = action.payload.message
+            let message = action.payload.message
             Alert.alert('Error', message)
             return state
         default:
