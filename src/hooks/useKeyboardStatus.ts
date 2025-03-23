@@ -7,8 +7,8 @@ import { Keyboard, EmitterSubscription } from "react-native";
  * @return {bool} isOpen
  */
 export function useKeyboardStatus() {
-    const [isOpen, setIsOpen] = useState(false);
-    const ref = useRef<{
+    let [isOpen, setIsOpen] = useState(false);
+    let ref = useRef<{
         keyboardShowListener?: EmitterSubscription,
         keyboardHideListener?: EmitterSubscription
     }>({})
