@@ -15,7 +15,7 @@ export interface userLoginWithEmail {
     password: string
 }
 export type RegisterParams = WelcomePropsRouteParams & { username: string }
-export const LoginRequest = (user: userLoginWithEmail):
+export var LoginRequest = (user: userLoginWithEmail):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         return auth().signInWithEmailAndPassword(user.email, user.password).then(rs => {
@@ -27,7 +27,7 @@ export const LoginRequest = (user: userLoginWithEmail):
                             setTimeout(() => {
                                 navigate('HomeTab')
                             }, 300);
-                            const {
+                            var {
                                 avatarURL,
                                 bio,
                                 birthday,
@@ -46,7 +46,7 @@ export const LoginRequest = (user: userLoginWithEmail):
                                 storyNotificationList,
                                 unSuggestList
                             } = rq.docs[0].data()
-                            const result: userPayload = {
+                            var result: userPayload = {
                                 user: {
                                     logined: true,
                                     firebaseUser: userx,
@@ -82,7 +82,7 @@ export const LoginRequest = (user: userLoginWithEmail):
         })
     }
 }
-export const LoginFailure = (): ErrorAction => {
+export var LoginFailure = (): ErrorAction => {
     return {
         type: userActionTypes.LOGIN_FAILURE,
         payload: {
@@ -90,13 +90,13 @@ export const LoginFailure = (): ErrorAction => {
         }
     }
 }
-export const LoginSuccess = (payload: userPayload): SuccessAction<userPayload> => {
+export var LoginSuccess = (payload: userPayload): SuccessAction<userPayload> => {
     return {
         type: userActionTypes.LOGIN_SUCCESS,
         payload: payload
     }
 }
-export const LogoutRequest = ():
+export var LogoutRequest = ():
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
@@ -114,7 +114,7 @@ export const LogoutRequest = ():
         }
     }
 }
-export const RegisterRequest = (userData: RegisterParams):
+export var RegisterRequest = (userData: RegisterParams):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         return auth()
@@ -158,7 +158,7 @@ export const RegisterRequest = (userData: RegisterParams):
             })
     }
 }
-export const RegisterFailure = (e: string): ErrorAction => {
+export var RegisterFailure = (e: string): ErrorAction => {
     return {
         payload: {
             message: e
@@ -166,20 +166,20 @@ export const RegisterFailure = (e: string): ErrorAction => {
         type: userActionTypes.REGISTER_FAILURE
     }
 }
-export const UnfollowRequest = (username: string):
+export var UnfollowRequest = (username: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('users')
+            var ref = firestore()
+            var rq = await ref.collection('users')
                 .where('username', '==', me.username).get()
             if (rq.size > 0) {
-                const targetUser = rq.docs[0]
-                const user: UserInfo = targetUser.data() || {}
+                var targetUser = rq.docs[0]
+                var user: UserInfo = targetUser.data() || {}
                 if (user.followings !== undefined &&
                     user.followings.indexOf(username) > -1) {
-                    const followings = [...user.followings]
+                    var followings = [...user.followings]
                     followings.splice(followings.indexOf(username), 1)
                     await targetUser.ref.update({
                         followings
@@ -195,7 +195,7 @@ export const UnfollowRequest = (username: string):
                         type: notificationTypes.FOLLOW_ME
                     }))
                 }
-                const rq2 = await targetUser.ref.get()
+                var rq2 = await targetUser.ref.get()
                 me = rq2.data() || {}
                 dispatch(UnfollowSuccess(me))
             } else {
@@ -207,7 +207,7 @@ export const UnfollowRequest = (username: string):
         }
     }
 }
-export const UnfollowFailure = (): ErrorAction => {
+export var UnfollowFailure = (): ErrorAction => {
     return {
         type: userActionTypes.UNFOLLOW_FAILURE,
         payload: {
@@ -215,7 +215,7 @@ export const UnfollowFailure = (): ErrorAction => {
         }
     }
 }
-export const UnfollowSuccess = (user: UserInfo): SuccessAction<UserInfo> => {
+export var UnfollowSuccess = (user: UserInfo): SuccessAction<UserInfo> => {
     return {
         type: userActionTypes.UNFOLLOW_SUCCESS,
         payload: user
@@ -224,21 +224,21 @@ export const UnfollowSuccess = (user: UserInfo): SuccessAction<UserInfo> => {
 /**
  * FETCH EXTRA INFO ACTION
  */
-export const FetchExtraInfoRequest = ():
+export var FetchExtraInfoRequest = ():
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('posts')
+            var ref = firestore()
+            var rq = await ref.collection('posts')
                 .where('userId', '==', me.username)
                 .orderBy('create_at', 'desc')
                 .get()
-            const tagPhotos = await ref.collection('posts')
+            var tagPhotos = await ref.collection('posts')
                 .where('tagUsername', 'array-contains', me.username)
                 .orderBy('create_at', 'desc')
                 .get()
-            const payload: ExtraInfoPayload = {
+            var payload: ExtraInfoPayload = {
                 currentStory: [],
                 extraInfo: {
                     unSuggestList: [],
@@ -250,16 +250,16 @@ export const FetchExtraInfoRequest = ():
                 photos: rq.docs.map(x => x.data()),
                 tagPhotos: tagPhotos.docs.map(x => x.data()),
             }
-            const rq2 = await ref.collection('users')
+            var rq2 = await ref.collection('users')
                 .where('username', '==', me.username).limit(1).get()
             if (rq2.size > 0) {
                 payload.extraInfo.followings = rq2.docs[0].data().followings || []
                 payload.extraInfo.unSuggestList = rq2.docs[0].data().unSuggestList || []
                 payload.extraInfo.requestedList = rq2.docs[0].data().requestedList || []
-                const rq3 = await ref.collection('users')
+                var rq3 = await ref.collection('users')
                     .where('followings', 'array-contains', me.username).get()
                 payload.extraInfo.followers = rq3.docs.map(x => x.data().username)
-                const rq5 = await ref.collection('stories')
+                var rq5 = await ref.collection('stories')
                     .where('userId', '==', me.username)
                     .where('create_at', '>=',
                         new Date(new Date().getTime() - 24 * 3600 * 1000))
@@ -274,7 +274,7 @@ export const FetchExtraInfoRequest = ():
         }
     }
 }
-export const FetchExtraInfoFailure = (): ErrorAction => {
+export var FetchExtraInfoFailure = (): ErrorAction => {
     return {
         type: userActionTypes.FETCH_EXTRA_INFO_FAILURE,
         payload: {
@@ -282,7 +282,7 @@ export const FetchExtraInfoFailure = (): ErrorAction => {
         }
     }
 }
-export const FetchExtraInfoSuccess = (extraInfo: ExtraInfoPayload):
+export var FetchExtraInfoSuccess = (extraInfo: ExtraInfoPayload):
     SuccessAction<ExtraInfoPayload> => {
     return {
         type: userActionTypes.FETCH_EXTRA_INFO_SUCCESS,
@@ -290,7 +290,7 @@ export const FetchExtraInfoSuccess = (extraInfo: ExtraInfoPayload):
     }
 }
 //update extra info
-export const UpdateExtraInfoRequest = (data: ExtraInfoPayload):
+export var UpdateExtraInfoRequest = (data: ExtraInfoPayload):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
@@ -302,41 +302,41 @@ export const UpdateExtraInfoRequest = (data: ExtraInfoPayload):
     }
 }
 //
-export const FollowContactsRequest = (phoneList: string[]):
+export var FollowContactsRequest = (phoneList: string[]):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('users')
+            var ref = firestore()
+            var rq = await ref.collection('users')
                 .where('username', '==', me.username).get()
             if (rq.size > 0) {
-                const targetUser = rq.docs[0]
+                var targetUser = rq.docs[0]
                 let userList: string[] = []
                 phoneList.map(async (phone, index) => {
-                    const rq2 = await ref.collection('users')
+                    var rq2 = await ref.collection('users')
                         .where('phone', '==', phone).get()
                     if (rq2.docs.length > 0) {
-                        const user = rq2.docs[0].data()
+                        var user = rq2.docs[0].data()
                         if (user.username) {
                             userList.push(user.username)
                         }
                     }
                     if (index === phoneList.length - 1) {
                         userList.map(async (username, index2) => {
-                            const user: UserInfo = targetUser.data() || {}
+                            var user: UserInfo = targetUser.data() || {}
                             if (user.followings !== undefined &&
                                 user.followings.indexOf(username) < 0 &&
                                 username !== me.username) {
                                 user.followings
                                     .push(username)
-                                const followings = [...user.followings]
+                                var followings = [...user.followings]
                                 await targetUser.ref.update({
                                     followings
                                 })
                             }
                             if (index2 === userList.length - 1) {
-                                const rq2 = await targetUser.ref.get()
+                                var rq2 = await targetUser.ref.get()
                                 me = rq2.data() || {}
                                 dispatch(FollowUserSuccess(me))
                             }
@@ -354,21 +354,21 @@ export const FollowContactsRequest = (phoneList: string[]):
         }
     }
 }
-export const ToggleFollowUserRequest = (username: string, refreshExtraInfo: boolean = false):
+export var ToggleFollowUserRequest = (username: string, refreshExtraInfo: boolean = false):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('users')
+            var ref = firestore()
+            var rq = await ref.collection('users')
                 .where('username', '==', me.username).get()
-            const targetUser = await ref.collection('users').doc(username).get()
+            var targetUser = await ref.collection('users').doc(username).get()
             if (rq.size > 0) {
-                const myUser = rq.docs[0]
-                const userData: UserInfo = myUser.data() || {}
-                const currentFollowings = userData.followings || []
-                const index = currentFollowings.indexOf(username)
-                const targetUserData: {
+                var myUser = rq.docs[0]
+                var userData: UserInfo = myUser.data() || {}
+                var currentFollowings = userData.followings || []
+                var index = currentFollowings.indexOf(username)
+                var targetUserData: {
                     privacySetting?: {
                         accountPrivacy: {
                             private: boolean
@@ -423,14 +423,14 @@ export const ToggleFollowUserRequest = (username: string, refreshExtraInfo: bool
         }
     }
 }
-export const FollowUserSuccess = (payload: UserInfo):
+export var FollowUserSuccess = (payload: UserInfo):
     SuccessAction<UserInfo> => {
     return {
         type: userActionTypes.FOLLOW_SUCCESS,
         payload,
     }
 }
-export const FollowUserFailure = ():
+export var FollowUserFailure = ():
     ErrorAction => {
     return {
         type: userActionTypes.FOLLOW_FAILURE,
@@ -440,19 +440,19 @@ export const FollowUserFailure = ():
     }
 }
 //SEND FOLLOW REQUEST
-export const ToggleSendFollowRequest = (username: string):
+export var ToggleSendFollowRequest = (username: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('users')
+            var ref = firestore()
+            var rq = await ref.collection('users')
                 .where('username', '==', me.username).get()
             if (rq.size > 0) {
-                const targetUser = await ref.collection('users').doc(username).get()
-                const targetUserData = targetUser.data() || {}
-                const requestedList = targetUserData.requestedList || []
-                const index = requestedList.indexOf(me.username)
+                var targetUser = await ref.collection('users').doc(username).get()
+                var targetUserData = targetUser.data() || {}
+                var requestedList = targetUserData.requestedList || []
+                var index = requestedList.indexOf(me.username)
                 if (index < 0) {
                     requestedList.push(me.username)
                 } else {
@@ -471,22 +471,22 @@ export const ToggleSendFollowRequest = (username: string):
     }
 }
 //UPDATE USER INFO ACTIONS 
-export const UpdateUserInfoRequest = (updateUserData: UserInfo):
+export var UpdateUserInfoRequest = (updateUserData: UserInfo):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('users')
+            var ref = firestore()
+            var rq = await ref.collection('users')
                 .where('username', '==', me.username).get()
             if (rq.size > 0) {
-                const userData: UserInfo = rq.docs[0].data()
-                const userRef = rq.docs[0].ref
-                const userInfo = {
+                var userData: UserInfo = rq.docs[0].data()
+                var userRef = rq.docs[0].ref
+                var userInfo = {
                     ...userData,
                     ...updateUserData
                 }
-                const { email,
+                var { email,
                     avatarURL,
                     bio,
                     birthday,
@@ -497,7 +497,7 @@ export const UpdateUserInfoRequest = (updateUserData: UserInfo):
                     username,
                     website
                 } = userInfo
-                const filterdUserInfo: UserInfo = {
+                var filterdUserInfo: UserInfo = {
                     email,
                     avatarURL,
                     bio,
@@ -527,7 +527,7 @@ export const UpdateUserInfoRequest = (updateUserData: UserInfo):
         }
     }
 }
-export const UpdateUserInfoFailure = (): ErrorAction => {
+export var UpdateUserInfoFailure = (): ErrorAction => {
     return {
         type: userActionTypes.UPDATE_USER_INFO_FAILURE,
         payload: {
@@ -535,26 +535,26 @@ export const UpdateUserInfoFailure = (): ErrorAction => {
         }
     }
 }
-export const UpdateUserInfoSuccess = (user: UserInfo): SuccessAction<UserInfo> => {
+export var UpdateUserInfoSuccess = (user: UserInfo): SuccessAction<UserInfo> => {
     return {
         type: userActionTypes.UPDATE_USER_INFO_SUCCESS,
         payload: user
     }
 }
 //UPDATE NOTIFICATION ACTIONS
-export const UpdateNotificationSettingsRequest = (setting: NotificationSetting):
+export var UpdateNotificationSettingsRequest = (setting: NotificationSetting):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             if (Object.keys(setting).length === 0) throw new Error;
-            const targetSetting = Object.keys(setting)[0]
+            var targetSetting = Object.keys(setting)[0]
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('users').doc(me.username).get()
-            const targetUser = rq.ref
+            var ref = firestore()
+            var rq = await ref.collection('users').doc(me.username).get()
+            var targetUser = rq.ref
             type TempIntersection = UserInfo & { notificationSetting?: NotificationSetting }
 
-            const user: TempIntersection = rq.data() || {}
+            var user: TempIntersection = rq.data() || {}
             if (user.notificationSetting) {
                 for (let [key, value] of Object.entries(user.notificationSetting)) {
                     if (setting.hasOwnProperty(key)) {
@@ -573,8 +573,8 @@ export const UpdateNotificationSettingsRequest = (setting: NotificationSetting):
                     ...setting
                 }
             })
-            const rq2 = await targetUser.get()
-            const result: TempIntersection = rq.data() || {}
+            var rq2 = await targetUser.get()
+            var result: TempIntersection = rq.data() || {}
             dispatch(UpdateNotificationSettingSuccess({
                 ...(user.notificationSetting || {}),
                 ...setting
@@ -584,14 +584,14 @@ export const UpdateNotificationSettingsRequest = (setting: NotificationSetting):
         }
     }
 }
-export const UpdateNotificationSettingSuccess = (payload: NotificationSetting):
+export var UpdateNotificationSettingSuccess = (payload: NotificationSetting):
     SuccessAction<NotificationSetting> => {
     return {
         type: userActionTypes.UPDATE_NOTIFICATION_SETTING_SUCCESS,
         payload,
     }
 }
-export const UpdateNotificationSettingFailure = ():
+export var UpdateNotificationSettingFailure = ():
     ErrorAction => {
     return {
         type: userActionTypes.UPDATE_NOTIFICATION_SETTING_FAILURE,
@@ -601,19 +601,19 @@ export const UpdateNotificationSettingFailure = ():
     }
 }
 //UPDATE PRIVACY SETTING ACTIONS
-export const UpdatePrivacySettingsRequest = (setting: PrivacySetting):
+export var UpdatePrivacySettingsRequest = (setting: PrivacySetting):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             if (Object.keys(setting).length === 0) throw new Error;
-            const targetSetting = Object.keys(setting)[0]
+            var targetSetting = Object.keys(setting)[0]
             let me: UserInfo = { ...store.getState().user.user.userInfo }
-            const ref = firestore()
-            const rq = await ref.collection('users').doc(me.username).get()
-            const targetUser = rq.ref
+            var ref = firestore()
+            var rq = await ref.collection('users').doc(me.username).get()
+            var targetUser = rq.ref
             type TempIntersection = UserInfo & { privacySetting?: PrivacySetting }
 
-            const user: TempIntersection = rq.data() || {}
+            var user: TempIntersection = rq.data() || {}
             if (user.privacySetting) {
                 for (let [key, value] of Object.entries(user.privacySetting)) {
                     if (setting.hasOwnProperty(key)) {
@@ -632,8 +632,8 @@ export const UpdatePrivacySettingsRequest = (setting: PrivacySetting):
                     ...setting
                 }
             })
-            const rq2 = await targetUser.get()
-            const result: TempIntersection = rq.data() || {}
+            var rq2 = await targetUser.get()
+            var result: TempIntersection = rq.data() || {}
             dispatch(UpdatePrivacySettingSuccess({
                 ...(user.privacySetting || {}),
                 ...setting
@@ -644,14 +644,14 @@ export const UpdatePrivacySettingsRequest = (setting: PrivacySetting):
         }
     }
 }
-export const UpdatePrivacySettingSuccess = (payload: PrivacySetting):
+export var UpdatePrivacySettingSuccess = (payload: PrivacySetting):
     SuccessAction<PrivacySetting> => {
     return {
         type: userActionTypes.UPDATE_PRIVACY_SETTING_SUCCESS,
         payload,
     }
 }
-export const UpdatePrivacySettingFailure = ():
+export var UpdatePrivacySettingFailure = ():
     ErrorAction => {
     return {
         type: userActionTypes.UPDATE_PRIVACY_SETTING_FAILURE,
@@ -660,18 +660,18 @@ export const UpdatePrivacySettingFailure = ():
         }
     }
 }
-export const UploadAvatarRequest = (uri: string, extension: string):
+export var UploadAvatarRequest = (uri: string, extension: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const me = store.getState().user.user.userInfo
-            const blob = await uriToBlob(uri)
-            const result = await storage().ref()
+            var me = store.getState().user.user.userInfo
+            var blob = await uriToBlob(uri)
+            var result = await storage().ref()
                 .child(`avatar/${me?.username}.${extension}`)
                 .put(blob as Blob, {
                     contentType: `image/${extension}`
                 })
-            const downloadUri = await result.ref.getDownloadURL()
+            var downloadUri = await result.ref.getDownloadURL()
             dispatch(UpdateUserInfoRequest({
                 avatarURL: downloadUri
             }))
@@ -680,18 +680,18 @@ export const UploadAvatarRequest = (uri: string, extension: string):
         }
     }
 }
-export const RemoveFollowerRequest = (username: string):
+export var RemoveFollowerRequest = (username: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const me = store.getState().user.user.userInfo
-            const ref = firestore()
-            const myUsername = me?.username || ""
-            const rq = await ref.collection('users')
+            var me = store.getState().user.user.userInfo
+            var ref = firestore()
+            var myUsername = me?.username || ""
+            var rq = await ref.collection('users')
                 .doc(username).get()
-            const targetUser: UserInfo = rq.data() || {}
-            const targetFollowings = targetUser.followings || []
-            const index = targetFollowings.indexOf(myUsername)
+            var targetUser: UserInfo = rq.data() || {}
+            var targetFollowings = targetUser.followings || []
+            var index = targetFollowings.indexOf(myUsername)
             if (index > -1) {
                 targetFollowings.splice(index, 1)
                 rq.ref.update({
@@ -705,18 +705,18 @@ export const RemoveFollowerRequest = (username: string):
     }
 }
 //FETCH SETTING ACTION
-export const FetchSettingRequest = ():
+export var FetchSettingRequest = ():
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
-        const me = store.getState().user.user.userInfo
-        const rq = await firestore().collection('users')
+        var me = store.getState().user.user.userInfo
+        var rq = await firestore().collection('users')
             .doc(me?.username).get()
         if (rq.exists) {
-            const {
+            var {
                 notificationSetting,
                 privacySetting,
             } = rq.data() || {}
-            const result: UserSetting = {
+            var result: UserSetting = {
                 notification: notificationSetting || defaultUserState.setting?.notification,
                 privacy: privacySetting || defaultUserState.setting?.privacy
             }
@@ -724,7 +724,7 @@ export const FetchSettingRequest = ():
         } else dispatch(FetchSettingFailure())
     }
 }
-export const FetchSettingFailure = (): ErrorAction => {
+export var FetchSettingFailure = (): ErrorAction => {
     return {
         type: userActionTypes.FETCH_SETTING_FAILURE,
         payload: {
@@ -732,33 +732,33 @@ export const FetchSettingFailure = (): ErrorAction => {
         }
     }
 }
-export const FetchSettingSuccess = (payload: UserSetting): SuccessAction<UserSetting> => {
+export var FetchSettingSuccess = (payload: UserSetting): SuccessAction<UserSetting> => {
     return {
         type: userActionTypes.FETCH_SETTING_SUCCESS,
         payload: payload
     }
 }
 //CONFIRM REQUEST ACTION
-export const ConfirmFollowRequest = (username: string):
+export var ConfirmFollowRequest = (username: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
-        const me = store.getState().user.user.userInfo
-        const ref = firestore()
-        const rq = await ref.collection('users')
+        var me = store.getState().user.user.userInfo
+        var ref = firestore()
+        var rq = await ref.collection('users')
             .doc(me?.username).get()
-        const targetUser = await ref.collection('users').doc(username).get()
+        var targetUser = await ref.collection('users').doc(username).get()
         if (rq.exists && targetUser.exists) {
-            const targetUserData: UserInfo = targetUser.data() || {}
-            const currentTargetUserFollowings = targetUserData.followings || []
+            var targetUserData: UserInfo = targetUser.data() || {}
+            var currentTargetUserFollowings = targetUserData.followings || []
             if (currentTargetUserFollowings.indexOf(me?.username || '') < 0) {
                 currentTargetUserFollowings.push(me?.username || '')
                 targetUser.ref.update({
                     followings: currentTargetUserFollowings
                 })
             }
-            const myUserData: UserInfo = rq.data() || {}
-            const currentRequest = myUserData.requestedList || []
-            const index = currentRequest.indexOf(username)
+            var myUserData: UserInfo = rq.data() || {}
+            var currentRequest = myUserData.requestedList || []
+            var index = currentRequest.indexOf(username)
             if (index > -1) {
                 currentRequest.splice(index, 1)
                 rq.ref.update({
@@ -771,27 +771,27 @@ export const ConfirmFollowRequest = (username: string):
         }
     }
 }
-export const DeclineFollowRequest = (username: string):
+export var DeclineFollowRequest = (username: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
-        const me = store.getState().user.user.userInfo
-        const ref = firestore()
-        const rq = await ref.collection('users')
+        var me = store.getState().user.user.userInfo
+        var ref = firestore()
+        var rq = await ref.collection('users')
             .doc(me?.username).get()
-        const targetUser = await ref.collection('users').doc(username).get()
+        var targetUser = await ref.collection('users').doc(username).get()
         if (rq.exists && targetUser.exists) {
-            const targetUserData: UserInfo = targetUser.data() || {}
-            const currentTargetUserFollowings = targetUserData.followings || []
-            const index = currentTargetUserFollowings.indexOf(me?.username || '')
+            var targetUserData: UserInfo = targetUser.data() || {}
+            var currentTargetUserFollowings = targetUserData.followings || []
+            var index = currentTargetUserFollowings.indexOf(me?.username || '')
             if (index > -1) {
                 currentTargetUserFollowings.splice(index, 1)
                 targetUser.ref.update({
                     followings: currentTargetUserFollowings
                 })
             }
-            const myUserData: UserInfo = rq.data() || {}
-            const currentRequest = myUserData.requestedList || []
-            const index2 = currentRequest.indexOf(username)
+            var myUserData: UserInfo = rq.data() || {}
+            var currentRequest = myUserData.requestedList || []
+            var index2 = currentRequest.indexOf(username)
             if (index2 > -1) {
                 currentRequest.splice(index2, 1)
                 rq.ref.update({
@@ -805,17 +805,17 @@ export const DeclineFollowRequest = (username: string):
     }
 }
 //ADD UNSUGGESTION LIST 
-export const UnSuggestionRequest = (username: string):
+export var UnSuggestionRequest = (username: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
-        const me = store.getState().user.user.userInfo
-        const ref = firestore()
-        const rq = await ref.collection('users')
+        var me = store.getState().user.user.userInfo
+        var ref = firestore()
+        var rq = await ref.collection('users')
             .doc(me?.username).get()
         if (rq.exists) {
-            const myUserData: UserInfo = rq.data() || {}
-            const currentUnSuggestList = myUserData.unSuggestList || []
-            const index = currentUnSuggestList.indexOf(username)
+            var myUserData: UserInfo = rq.data() || {}
+            var currentUnSuggestList = myUserData.unSuggestList || []
+            var index = currentUnSuggestList.indexOf(username)
             if (index < 0) {
                 currentUnSuggestList.push(username)
                 rq.ref.update({
@@ -829,16 +829,16 @@ export const UnSuggestionRequest = (username: string):
     }
 }
 // change search recent list
-export const FetchRecentSearchRequest = ():
+export var FetchRecentSearchRequest = ():
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, SuccessAction<SearchItem[]>>) => {
-        const me = store.getState().user.user.userInfo
-        const ref = firestore()
-        const rq = await ref.collection('users')
+        var me = store.getState().user.user.userInfo
+        var ref = firestore()
+        var rq = await ref.collection('users')
             .doc(me?.username).get()
         if (rq.exists) {
-            const myUserData: UserInfo = rq.data() || {}
-            const recentSearchList: SearchItem[] = myUserData.searchRecent || []
+            var myUserData: UserInfo = rq.data() || {}
+            var recentSearchList: SearchItem[] = myUserData.searchRecent || []
             dispatch({
                 type: userActionTypes.FETCH_RECENT_SEARCH_SUCCESS,
                 payload: recentSearchList
@@ -848,18 +848,18 @@ export const FetchRecentSearchRequest = ():
         }
     }
 }
-export const PushRecentSearchRequest = (searchItem: SearchItem):
+export var PushRecentSearchRequest = (searchItem: SearchItem):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
-        const me = store.getState().user.user.userInfo
-        const ref = firestore()
-        const rq = await ref.collection('users')
+        var me = store.getState().user.user.userInfo
+        var ref = firestore()
+        var rq = await ref.collection('users')
             .doc(me?.username).get()
         if (rq.exists) {
-            const myUserData: UserInfo = rq.data() || {}
-            const recentSearchList: SearchItem[] = myUserData.searchRecent || []
-            const temp = [...recentSearchList]
-            const check = temp.every((item, index) => {
+            var myUserData: UserInfo = rq.data() || {}
+            var recentSearchList: SearchItem[] = myUserData.searchRecent || []
+            var temp = [...recentSearchList]
+            var check = temp.every((item, index) => {
                 if ((item.username === searchItem.username && searchItem.type === 1
                     && item.type === 1)
                     || (item.hashtag === searchItem.hashtag && searchItem.type === 2
@@ -885,17 +885,17 @@ export const PushRecentSearchRequest = (searchItem: SearchItem):
         }
     }
 }
-export const RemoveRecentSearchRequest = (searchItem: SearchItem):
+export var RemoveRecentSearchRequest = (searchItem: SearchItem):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
-        const me = store.getState().user.user.userInfo
-        const ref = firestore()
-        const rq = await ref.collection('users')
+        var me = store.getState().user.user.userInfo
+        var ref = firestore()
+        var rq = await ref.collection('users')
             .doc(me?.username).get()
         if (rq.exists) {
-            const myUserData: UserInfo = rq.data() || {}
-            const recentSearchList: SearchItem[] = myUserData.searchRecent || []
-            const temp = [...recentSearchList]
+            var myUserData: UserInfo = rq.data() || {}
+            var recentSearchList: SearchItem[] = myUserData.searchRecent || []
+            var temp = [...recentSearchList]
             temp.every((item, index) => {
                 if ((item.username === searchItem.username && searchItem.type === 1
                     && item.type === 1)
@@ -918,15 +918,15 @@ export const RemoveRecentSearchRequest = (searchItem: SearchItem):
         }
     }
 }
-export const ToggleBookMarkRequest = (postId: number, previewUri: string):
+export var ToggleBookMarkRequest = (postId: number, previewUri: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const collections = [...(store.getState().user.bookmarks || [])]
+            var collections = [...(store.getState().user.bookmarks || [])]
             if (collections.length > 0) {
-                const newCollections = collections.map((collection, index) => {
-                    const bookmarks = [...collection.bookmarks]
-                    const index2 = bookmarks.findIndex(x => x.postId === postId)
+                var newCollections = collections.map((collection, index) => {
+                    var bookmarks = [...collection.bookmarks]
+                    var index2 = bookmarks.findIndex(x => x.postId === postId)
                     if (index2 > -1) {
                         bookmarks.splice(index2, 1)
                         if (collection.avatarIndex === index2
@@ -981,12 +981,12 @@ export const ToggleBookMarkRequest = (postId: number, previewUri: string):
         }
     }
 }
-export const CreateBookmarkCollectionRequest = (collection: BookmarkCollection):
+export var CreateBookmarkCollectionRequest = (collection: BookmarkCollection):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const collections = [...(store.getState().user.bookmarks || [])]
-            const index = collections.findIndex(x => x.name === collection.name)
+            var collections = [...(store.getState().user.bookmarks || [])]
+            var index = collections.findIndex(x => x.name === collection.name)
             if (index > -1) {
                 dispatch({
                     type: userActionTypes.UPDATE_BOOKMARK_FAILURE,
@@ -1014,11 +1014,11 @@ export const CreateBookmarkCollectionRequest = (collection: BookmarkCollection):
         }
     }
 }
-export const RemoveBookmarkCollectionRequest = (collectionName: string):
+export var RemoveBookmarkCollectionRequest = (collectionName: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const collections = [...(store.getState().user.bookmarks || [])]
+            var collections = [...(store.getState().user.bookmarks || [])]
                 .filter(x => x.name !== collectionName)
             dispatch({
                 type: userActionTypes.UPDATE_BOOKMARK_SUCCESS,
@@ -1037,16 +1037,16 @@ export const RemoveBookmarkCollectionRequest = (collectionName: string):
         }
     }
 }
-export const RemoveFromBookmarkCollectionRequest = (postId: number, collectionName: string):
+export var RemoveFromBookmarkCollectionRequest = (postId: number, collectionName: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
             let collections = [...(store.getState().user.bookmarks || [])]
             if (collectionName !== 'All Posts') {
-                const index = collections.findIndex(x => x.name === collectionName)
+                var index = collections.findIndex(x => x.name === collectionName)
                 if (index > -1) {
-                    const collection = { ...collections[index] }
-                    const index2 = collection.bookmarks.findIndex(x => x.postId === postId)
+                    var collection = { ...collections[index] }
+                    var index2 = collection.bookmarks.findIndex(x => x.postId === postId)
                     collection.bookmarks.splice(index2, 1)
                     if (collection.avatarIndex === index2) {
                         collection.avatarIndex = 0
@@ -1055,7 +1055,7 @@ export const RemoveFromBookmarkCollectionRequest = (postId: number, collectionNa
                 }
             } else {
                 collections = collections.map(collection => {
-                    const index2 = collection.bookmarks.findIndex(x => x.postId === postId)
+                    var index2 = collection.bookmarks.findIndex(x => x.postId === postId)
                     collection.bookmarks.splice(index2, 1)
                     if (collection.avatarIndex === index2
                         && collection.bookmarks.length > 0
@@ -1083,24 +1083,24 @@ export const RemoveFromBookmarkCollectionRequest = (postId: number, collectionNa
         }
     }
 }
-export const MoveBookmarkToCollectionRequest = (fromCollectionName: string,
+export var MoveBookmarkToCollectionRequest = (fromCollectionName: string,
     targetCollectionName: string, postId: number):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const collections = [...(store.getState().user.bookmarks || [])]
-            const fromCollectionIndex = collections.findIndex(x => x.name === fromCollectionName)
-            const targetCollectionIndex = collections.findIndex(x => x.name === targetCollectionName)
-            const fromBookmarkIndex = collections[fromCollectionIndex].bookmarks
+            var collections = [...(store.getState().user.bookmarks || [])]
+            var fromCollectionIndex = collections.findIndex(x => x.name === fromCollectionName)
+            var targetCollectionIndex = collections.findIndex(x => x.name === targetCollectionName)
+            var fromBookmarkIndex = collections[fromCollectionIndex].bookmarks
                 .findIndex(x => x.postId === postId)
             if (fromBookmarkIndex > -1) {
-                const newFromCollection = {
+                var newFromCollection = {
                     ...collections[fromCollectionIndex],
                 }
-                const newTargetCollection = {
+                var newTargetCollection = {
                     ...collections[targetCollectionIndex]
                 }
-                const bookmark = newFromCollection.bookmarks
+                var bookmark = newFromCollection.bookmarks
                     .splice(fromBookmarkIndex, 1)[0]
                 if (newFromCollection.avatarIndex === fromBookmarkIndex
                     && newFromCollection.bookmarks.length > 0
@@ -1133,16 +1133,16 @@ export const MoveBookmarkToCollectionRequest = (fromCollectionName: string,
         }
     }
 }
-export const AddBookmarkToCollectionRequest = (
+export var AddBookmarkToCollectionRequest = (
     collectionName: string, bookmarkList: Bookmark[]):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const collections = [...(store.getState().user.bookmarks || [])]
-            const index = collections
+            var collections = [...(store.getState().user.bookmarks || [])]
+            var index = collections
                 .findIndex(x => x.name === collectionName)
             if (index > -1) {
-                const collection = { ...collections[index] }
+                var collection = { ...collections[index] }
                 bookmarkList.map(bookmark => {
                     if (!collection.bookmarks
                         .find(x => x.postId === bookmark.postId)
@@ -1171,15 +1171,15 @@ export const AddBookmarkToCollectionRequest = (
         }
     }
 }
-export const UpdateBookmarkCollectionRequest = (collectionName: string, updatedCollection: BookmarkCollection):
+export var UpdateBookmarkCollectionRequest = (collectionName: string, updatedCollection: BookmarkCollection):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const collections = [...(store.getState().user.bookmarks || [])]
-            const index = collections
+            var collections = [...(store.getState().user.bookmarks || [])]
+            var index = collections
                 .findIndex(x => x.name === collectionName)
             if (index > -1) {
-                const collection = {
+                var collection = {
                     ...updatedCollection
                 }
                 collections[index] = collection
@@ -1202,14 +1202,14 @@ export const UpdateBookmarkCollectionRequest = (collectionName: string, updatedC
     }
 }
 //Archive Actions
-export const FetchArchiveRequest = ():
+export var FetchArchiveRequest = ():
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const rq = await ref.collection('users').doc(myUsername).get()
-            const userData: ProfileX = rq.data() as ProfileX
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var rq = await ref.collection('users').doc(myUsername).get()
+            var userData: ProfileX = rq.data() as ProfileX
             dispatch({
                 type: userActionTypes.FETCH_ARCHIVE_SUCCESS,
                 payload: {
@@ -1227,22 +1227,22 @@ export const FetchArchiveRequest = ():
         }
     }
 }
-export const AddStoryArchiveRequest = (storyList: StoryArchive[]):
+export var AddStoryArchiveRequest = (storyList: StoryArchive[]):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const storyArchiveList = [...(store.getState().user
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var storyArchiveList = [...(store.getState().user
                 .archive?.stories || [])]
-            const postArchiveList = [...(store.getState().user
+            var postArchiveList = [...(store.getState().user
                 .archive?.posts || [])]
             storyList.map(story => {
                 if (!!!storyArchiveList.find(x => x.uid === story.uid)) {
                     storyArchiveList.push(story)
                 }
             })
-            const rq = await ref.collection('users').doc(myUsername).get()
+            var rq = await ref.collection('users').doc(myUsername).get()
             if (rq.exists) {
                 await rq.ref.update({
                     archive: {
@@ -1258,22 +1258,22 @@ export const AddStoryArchiveRequest = (storyList: StoryArchive[]):
         }
     }
 }
-export const AddPostArchiveRequest = (postList: PostArchive[]):
+export var AddPostArchiveRequest = (postList: PostArchive[]):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const storyArchiveList = [...(store.getState().user
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var storyArchiveList = [...(store.getState().user
                 .archive?.stories || [])]
-            const postArchiveList = [...(store.getState().user
+            var postArchiveList = [...(store.getState().user
                 .archive?.posts || [])]
             postList.map(post => {
                 if (!!!postArchiveList.find(x => x.uid === post.uid)) {
                     postArchiveList.push(post)
                 }
             })
-            const rq = await ref.collection('users').doc(myUsername).get()
+            var rq = await ref.collection('users').doc(myUsername).get()
             if (rq.exists) {
                 await rq.ref.update({
                     archive: {
@@ -1294,19 +1294,19 @@ export const AddPostArchiveRequest = (postList: PostArchive[]):
         }
     }
 }
-export const RemovePostArchiveRequest = (uid: number):
+export var RemovePostArchiveRequest = (uid: number):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const storyArchiveList = [...(store.getState().user
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var storyArchiveList = [...(store.getState().user
                 .archive?.stories || [])]
-            const postArchiveList = [...(store.getState().user
+            var postArchiveList = [...(store.getState().user
                 .archive?.posts || [])]
-            const index = postArchiveList.findIndex(x => x.uid === uid)
+            var index = postArchiveList.findIndex(x => x.uid === uid)
             postArchiveList.splice(index, 1)
-            const rq = await ref.collection('users').doc(myUsername).get()
+            var rq = await ref.collection('users').doc(myUsername).get()
             if (rq.exists) {
                 await rq.ref.update({
                     archive: {
@@ -1328,15 +1328,15 @@ export const RemovePostArchiveRequest = (uid: number):
     }
 }
 //Highlight actions
-export const FetchHighlightRequest = ():
+export var FetchHighlightRequest = ():
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const rq = await ref.collection('users').doc(myUsername).get()
-            const userData: ProfileX = rq.data() as ProfileX
-            const highlights = (userData.highlights || [])
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var rq = await ref.collection('users').doc(myUsername).get()
+            var userData: ProfileX = rq.data() as ProfileX
+            var highlights = (userData.highlights || [])
                 .filter(x => x.stories.length > 0)
             dispatch({
                 type: userActionTypes.FETCH_HIGHLIGHT_SUCCESS,
@@ -1350,19 +1350,19 @@ export const FetchHighlightRequest = ():
         }
     }
 }
-export const AddStoryToHighlightRequest = (storyList: StoryArchive[],
+export var AddStoryToHighlightRequest = (storyList: StoryArchive[],
     targetHighlightName: string, avatarUri?: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const rq = await ref.collection('users').doc(`${myUsername}`).get()
-            const currentHighLight = [...(store.getState().user.highlights || [])]
-            const index = currentHighLight.findIndex(x => x.name === targetHighlightName)
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var rq = await ref.collection('users').doc(`${myUsername}`).get()
+            var currentHighLight = [...(store.getState().user.highlights || [])]
+            var index = currentHighLight.findIndex(x => x.name === targetHighlightName)
             if (index > -1 && rq.exists) {
-                const highlight = { ...currentHighLight[index] }
-                const stories = [...highlight.stories]
+                var highlight = { ...currentHighLight[index] }
+                var stories = [...highlight.stories]
                 storyList.map(story => {
                     if (!!!stories.find(x => x.uid === story.uid)) {
                         stories.push(story)
@@ -1395,18 +1395,18 @@ export const AddStoryToHighlightRequest = (storyList: StoryArchive[],
         }
     }
 }
-export const RemoveFromHighlightRequest = (uid: number, targetHighlightName: string):
+export var RemoveFromHighlightRequest = (uid: number, targetHighlightName: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const rq = await ref.collection('users').doc(`${myUsername}`).get()
-            const currentHighLight = [...(store.getState().user.highlights || [])]
-            const index = currentHighLight.findIndex(x => x.name === targetHighlightName)
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var rq = await ref.collection('users').doc(`${myUsername}`).get()
+            var currentHighLight = [...(store.getState().user.highlights || [])]
+            var index = currentHighLight.findIndex(x => x.name === targetHighlightName)
             if (index > -1) {
-                const highlight = { ...currentHighLight[index] }
-                const stories = [...highlight.stories]
+                var highlight = { ...currentHighLight[index] }
+                var stories = [...highlight.stories]
                 highlight.stories = stories.filter(x => x.uid !== uid)
                 if (highlight.stories.length === 0) {
                     currentHighLight.splice(index, 1)
@@ -1427,15 +1427,15 @@ export const RemoveFromHighlightRequest = (uid: number, targetHighlightName: str
         }
     }
 }
-export const RemoveHighlightRequest = (targetHighlightName: string):
+export var RemoveHighlightRequest = (targetHighlightName: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const rq = await ref.collection('users').doc(`${myUsername}`).get()
-            const currentHighLight = [...(store.getState().user.highlights || [])]
-            const index = currentHighLight.findIndex(x => x.name === targetHighlightName)
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var rq = await ref.collection('users').doc(`${myUsername}`).get()
+            var currentHighLight = [...(store.getState().user.highlights || [])]
+            var index = currentHighLight.findIndex(x => x.name === targetHighlightName)
             if (index > -1) {
                 currentHighLight.splice(index, 1)
                 await rq.ref.update({
@@ -1454,15 +1454,15 @@ export const RemoveHighlightRequest = (targetHighlightName: string):
         }
     }
 }
-export const EditHighlightRequest = (editedHighlight: Highlight, targetHighlightName: string):
+export var EditHighlightRequest = (editedHighlight: Highlight, targetHighlightName: string):
     ThunkAction<Promise<void>, {}, {}, userAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, userAction>) => {
         try {
-            const ref = firestore()
-            const myUsername = `${store.getState().user.user.userInfo?.username}`
-            const rq = await ref.collection('users').doc(`${myUsername}`).get()
-            const currentHighLight = [...(store.getState().user.highlights || [])]
-            const index = currentHighLight.findIndex(x => x.name === targetHighlightName)
+            var ref = firestore()
+            var myUsername = `${store.getState().user.user.userInfo?.username}`
+            var rq = await ref.collection('users').doc(`${myUsername}`).get()
+            var currentHighLight = [...(store.getState().user.highlights || [])]
+            var index = currentHighLight.findIndex(x => x.name === targetHighlightName)
             if (index > -1) {
                 currentHighLight[index] = { ...editedHighlight }
                 await rq.ref.update({
